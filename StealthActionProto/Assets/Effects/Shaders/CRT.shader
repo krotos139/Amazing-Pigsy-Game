@@ -40,6 +40,8 @@ Shader "Custom/CRT"
         uniform float _lines; // 2.4f
         uniform float _OutputGamma; //2.2f
 		uniform float _HueShift; // 0.1f
+		uniform float _Effect; // 0.0f
+		uniform float _Die;
  
 		float3 rgb2hsv(float3 c) {
 			float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -110,8 +112,20 @@ Shader "Custom/CRT"
            
             float3 dotMaskWeights = lerp(rgb1, rgb2, floor(fmod(_Factor, 2.0f)));
             res *= dotMaskWeights;
-           
-            return float4(pow(res, float3(1.0f / _OutputGamma, 1.0f / _OutputGamma, 1.0f / _OutputGamma)), 1.0f);
+
+			/// DIE
+			/*
+			float2 xy_r = RadialDistortion(_Texcoord, _Die * -0.5);
+			float2 xy_g = RadialDistortion(_Texcoord, _Die * 1.5);
+			float2 xy_b = RadialDistortion(_Texcoord, _Die * -4.5);
+			float die_col_r = tex2D(_MainTex, xy_r).r;
+			float die_col_g = tex2D(_MainTex, xy_g).g;
+			float die_col_b = tex2D(_MainTex, xy_b).b;
+			float4 col_die = lerp(float4(0.4f, 0.1f, 0.1f, 1.0f), float4(die_col_r, die_col_g * (1.0f - 0.3f * _Die), die_col_b * (1.0f - 0.3f * _Die), 1.0f), smoothstep(1.0f, 0.5f, _Die));
+           */
+			float4 col_die = tex2D(_MainTex, _Texcoord);
+		   /// DIE
+            return lerp(float4(pow(res, float3(1.0f / _OutputGamma, 1.0f / _OutputGamma, 1.0f / _OutputGamma)), 1.0f), col_die, _Effect);
            
            
         }

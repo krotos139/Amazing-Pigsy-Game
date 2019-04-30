@@ -14,6 +14,7 @@ public class CameraFollow2D : MonoBehaviour
     void Start()
     {
         offset = new Vector2(Mathf.Abs(offset.x), offset.y);
+        transform.position = new Vector3(player.position.x, player.position.y, transform.position.z);
     }
 
     void Update()
